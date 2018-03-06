@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>测试报告</title>
+    <meta name="generator" content="HTMLTestRunner 0.8.3"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    
+<style type="text/css" media="screen">
+body        { font-family: verdana, arial, helvetica, sans-serif; font-size: 80%; }
+table       { font-size: 100%; }
+pre         { }
+
+/* -- heading ---------------------------------------------------------------------- */
+h1 {
+	font-size: 16pt;
+	color: gray;
+}
+.heading {
+    margin-top: 0ex;
+    margin-bottom: 1ex;
+}
+
+.heading .attribute {
+    margin-top: 1ex;
+    margin-bottom: 0;
+}
+
+.heading .description {
+    margin-top: 4ex;
+    margin-bottom: 6ex;
+}
+
+/* -- css div popup ------------------------------------------------------------------------ */
+a.popup_link {
+}
+
+a.popup_link:hover {
+    color: red;
+}
+.img{
+	width: 100%;
+	height: 100%;
+	border-collapse: collapse;
+    border: 2px solid #777;
+}
+
+.screenshots {
+    z-index: 100;
+	position:absolute;
+	left: 23%;
+	top: 20%;
+	display: none;
+}
+.close_shots {
+	position:absolute;
+	top:0; left:98%;
+	z-index:99;
+	width:20px;
+}
+.popup_window {
+    display: none;
+    position: relative;
+    left: 0px;
+    top: 0px;
+    /*border: solid #627173 1px; */
+    padding: 10px;
+    background-color: #E6E6D6;
+    font-family: "Lucida Console", "Courier New", Courier, monospace;
+    text-align: left;
+    font-size: 8pt;
+    width: 500px;
+}
+
+}
+/* -- report ------------------------------------------------------------------------ */
+#show_detail_line {
+    margin-top: 3ex;
+    margin-bottom: 1ex;
+}
+#result_table {
+    width: 80%;
+    border-collapse: collapse;
+    border: 1px solid #777;
+}
+#header_row {
+    font-weight: bold;
+    color: white;
+    background-color: #777;
+}
+#result_table td {
+    border: 1px solid #777;
+    padding: 2px;
+}
+#total_row  { font-weight: bold; }
+.passClass  { background-color: #6c6; }
+.failClass  { background-color: #c60; }
+.errorClass { background-color: #c00; }
+.passCase   { color: #6c6; }
+.failCase   { color: #c60; font-weight: bold; }
+.errorCase  { color: #c00; font-weight: bold; }
+.hiddenRow  { display: none; }
+.testcase   { margin-left: 2em; }
+
+
+/* -- ending ---------------------------------------------------------------------- */
+#ending {
+}
+
+
+.piechart{
+    position:absolute;  ;
+    top:20px;
+    left:300px;
+    width: 200px;
+    float: left;
+    display:  inline;
+}
+
+
+</style>
+
+</head>
+<body>
+<script language="javascript" type="text/javascript">
+output_list = Array();
+
+/* level - 0:Summary; 1:Failed; 2:All */
+function showCase(level) {
+    trs = document.getElementsByTagName("tr");
+    for (var i = 0; i < trs.length; i++) {
+        tr = trs[i];
+        id = tr.id;
+        if (id.substr(0,2) == 'ft') {
+            if (level < 1) {
+                tr.className = 'hiddenRow';
+            }
+            else {
+                tr.className = '';
+            }
+        }
+        if (id.substr(0,2) == 'pt') {
+            if (level > 1) {
+                tr.className = '';
+            }
+            else {
+                tr.className = 'hiddenRow';
+            }
+        }
+    }
+}
+
+
+function showClassDetail(cid, count) {
+    var id_list = Array(count);
+    var toHide = 1;
+    for (var i = 0; i < count; i++) {
+        tid0 = 't' + cid.substr(1) + '.' + (i+1);
+        tid = 'f' + tid0;
+        tr = document.getElementById(tid);
+        if (!tr) {
+            tid = 'p' + tid0;
+            tr = document.getElementById(tid);
+        }
+        id_list[i] = tid;
+        if (tr.className) {
+            toHide = 0;
+        }
+    }
+    for (var i = 0; i < count; i++) {
+        tid = id_list[i];
+        if (toHide) {
+            document.getElementById('div_'+tid).style.display = 'none'
+            document.getElementById(tid).className = 'hiddenRow';
+        }
+        else {
+            document.getElementById(tid).className = '';
+        }
+    }
+}
+
+
+function showTestDetail(div_id){
+    var details_div = document.getElementById(div_id)
+    var displayState = details_div.style.display
+    // alert(displayState)
+    if (displayState != 'block' ) {
+        displayState = 'block'
+        details_div.style.display = 'block'
+    }
+    else {
+        details_div.style.display = 'none'
+    }
+}
+
+
+function html_escape(s) {
+    s = s.replace(/&/g,'&amp;');
+    s = s.replace(/</g,'&lt;');
+    s = s.replace(/>/g,'&gt;');
+    return s;
+}
+
+function drawCircle(pass, fail, error){
+    var color = ["#6c6","#c60","#c00"];
+    var data = [pass,fail,error];
+    var text_arr = ["pass", "fail", "error"];
+
+    var canvas = document.getElementById("circle");
+    var ctx = canvas.getContext("2d");
+    var startPoint=0;
+    var width = 20, height = 10;
+    var posX = 112 * 2 + 20, posY = 30;
+    var textX = posX + width + 5, textY = posY + 10;
+    for(var i=0;i<data.length;i++){
+        ctx.fillStyle = color[i];
+        ctx.beginPath();
+        ctx.moveTo(112,84);
+        ctx.arc(112,84,84,startPoint,startPoint+Math.PI*2*(data[i]/(data[0]+data[1]+data[2])),false);
+        ctx.fill();
+        startPoint += Math.PI*2*(data[i]/(data[0]+data[1]+data[2]));
+        ctx.fillStyle = color[i];
+        ctx.fillRect(posX, posY + 20 * i, width, height);
+        ctx.moveTo(posX, posY + 20 * i);
+        ctx.font = 'bold 14px';
+        ctx.fillStyle = color[i];
+        var percent = text_arr[i] + ":"+data[i];
+        ctx.fillText(percent, textX, textY + 20 * i);
+
+    }
+}
+
+function show_shots(obj) {
+	obj.nextElementSibling.style.display="block";
+
+}
+
+function close_shots(obj) {
+	obj.parentElement.style.display="none";
+}
+
+</script>
+<div class="piechart">
+    <div>
+        <canvas id="circle" width="350" height="168" </canvas>
+    </div>
+</div>
+<div class='heading'>
+<h1>测试报告</h1>
+<p class='attribute'><strong>开始时间:</strong> 2018-01-29 11:47:28</p>
+<p class='attribute'><strong>耗时:</strong> 0:00:00.116075</p>
+<p class='attribute'><strong>状态:</strong> <span class="tj passCase">Pass</span>7 <span class="tj failCase">Failure</span>1</p>
+
+<p class='description'>测试描述</p>
+</div>
+
+
+
+<p id='show_detail_line'>显示
+<a href='javascript:showCase(0)'>概要</a>
+<a href='javascript:showCase(1)'>失败</a>
+<a href='javascript:showCase(2)'>所有</a>
+</p>
+
+<table id='result_table'>
+<colgroup>
+<col align='left' />
+<col align='right' />
+<col align='right' />
+<col align='right' />
+<col align='right' />
+<col align='right' />
+<col align='right' />
+</colgroup>
+<tr id='header_row'>
+    <td>测试组/测试用例</td>
+    <td>总数</td>
+    <td>通过</td>
+    <td>失败</td>
+    <td>错误</td>
+    <td>视图</td>
+    <td>错误截图</td>
+</tr>
+
+<tr class='failClass'>
+    <td>mokuai01.test01.Test: 测试test01</td>
+    <td>2</td>
+    <td>1</td>
+    <td>1</td>
+    <td>0</td>
+    <td><a href="javascript:showClassDetail('c1',2)">详情</a></td>
+    <td>&nbsp;</td>
+</tr>
+
+<tr id='pt1.1' class='hiddenRow'>
+    <td ><div class='testcase'>testAdd</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.1')" >
+        通过</a></span>
+
+    <div id='div_pt1.1' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.1').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.1: True
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='ft1.2' class='none'>
+    <td ><div class='testcase'>testMultiply</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status failCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_ft1.2')" >
+        失败</a></span>
+
+    <div id='div_ft1.2' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_ft1.2').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+ft1.2: Traceback (most recent call last):
+  File "D:\test\pro_test\case\mokuai01\test01.py", line 25, in testMultiply
+    self.assertEqual(result,5) #断言(检查点)pass or failed  result与期望结果6  之间的对比
+AssertionError: 6 != 5
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr class='passClass'>
+    <td>mokuai01.test02.TestLoginAblesky: ablesky登录测试</td>
+    <td>2</td>
+    <td>2</td>
+    <td>0</td>
+    <td>0</td>
+    <td><a href="javascript:showClassDetail('c2',2)">详情</a></td>
+    <td>&nbsp;</td>
+</tr>
+
+<tr id='pt2.1' class='hiddenRow'>
+    <td ><div class='testcase'>testLogin</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt2.1')" >
+        通过</a></span>
+
+    <div id='div_pt2.1' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt2.1').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt2.1: b'&lt;!DOCTYPE html&gt;\r\n&lt;html&gt;\r\n&lt;head&gt;\r\n\t&lt;meta charset="utf-8" /&gt;\r\n&lt;title&gt;\xe8\x83\xbd\xe5\x8a\x9b\xe5\xa4\xa9\xe7\xa9\xba - \xe5\x85\xa8\xe7\x90\x83\xe7\x9f\xa5\xe8\xaf\x86\xe4\xba\xa4\xe6\x98\x93\xe5\xb9\xb3\xe5\x8f\xb0&lt;/title&gt;\r\n&lt;meta name="description" content="\xe5\x85\xa8\xe7\x90\x83\xe9\xa6\x96\xe5\xae\xb6\xe8\xb7\xa8\xe5\x9b\xbd\xe7\x9f\xa5\xe8\xaf\x86\xe4\xba\xa4\xe6\x98\x93\xe5\xb9\xb3\xe5\x8f\xb0\xef\xbc\x8c \xe4\xb9\xb0\xe4\xbd\xa0\xe6\x89\x80\xe9\x9c\x80\xef\xbc\x81 \xe5\x8d\x96\xe4\xbd\xa0\xe6\x89\x80\xe6\x9c\x89\xef\xbc\x81\xe5\x9c\xa8\xe8\xbf\x99\xe9\x87\x8c\xef\xbc\x8c \xe4\xb8\x80\xe5\xae\x9a\xe6\x9c\x89\xe4\xba\xba\xe9\x9c\x80\xe8\xa6\x81\xe4\xbd\xa0\xe7\x9a\x84\xe5\xb8\xae\xe5\x8a\xa9\xef\xbc\x81 \xe6\x97\xa0\xe8\xae\xba\xe4\xbd\xa0\xe5\xb9\xb4\xe9\xbe\x84\xe5\xa4\x9a\xe5\xa4\xa7\xef\xbc\x8c \xe8\x81\x8c\xe4\xb8\x9a\xe5\xa6\x82\xe4\xbd\x95\xef\xbc\x8c \xe5\x8f\xaa\xe8\xa6\x81\xe6\x82\xa8\xe8\x83\xbd\xe6\x95\x99\xe5\xad\xa6\xe6\x8c\x87\xe5\xaf\xbc\xef\xbc\x8c \xe6\x8f\x90\xe4\xbe\x9b\xe5\x92\xa8\xe8\xaf\xa2\xef\xbc\x8c \xe5\x88\x86\xe4\xba\xab\xe7\xbb\x8f\xe9\xaa\x8c\xef\xbc\x8c \xe5\xb0\x86\xe4\xbd\xa0\xe7\x9a\x84\xe4\xbc\x98\xe5\x8a\xbf\xe5\xb1\x95\xe7\x8e\xb0\xe5\x87\xba\xe6\x9d\xa5\xe6\x8d\xa2\xe5\x8f\x96\xe6\x8a\xa5\xe9\x85\xac\xef\xbc\x81\xe5\x9c\xa8\xe8\xbf\x99\xe9\x87\x8c\xef\xbc\x8c \xe4\xb8\x80\xe5\xae\x9a\xe6\x9c\x89\xe4\xbd\xa0\xe6\x83\xb3\xe8\xa6\x81\xe5\xbe\x97\xe5\x88\xb0\xe7\x9a\x84\xe7\x9f\xa5\xe8\xaf\x86\xe6\x8a\x80\xe8\x83\xbd\xef\xbc\x81 \xe6\x83\xb3\xe6\x8f\x90\xe9\xab\x98\xe5\x8f\xa3\xe8\xaf\xad\xe6\xb0\xb4\xe5\xb9\xb3\xef\xbc\x9f \xe6\x83\xb3\xe8\x8e\xb7\xe5\xbe\x97\xe4\xb8\x93\xe5\xae\xb6\xe5\xbb\xba\xe8\xae\xae\xef\xbc\x9f \xe6\x83\xb3\xe6\xbb\xa1\xe8\xb6\xb3\xe5\xa5\xbd\xe5\xa5\x87\xef\xbc\x9f \xe6\x83\xb3\xe7\xbb\x8f\xe9\xaa\x8c\xe7\xb2\xbe\xe8\xbf\x9b\xef\xbc\x9f \xe5\x91\x8a\xe8\xaf\x89\xe6\x88\x91\xe4\xbb\xac\xe4\xbd\xa0\xe7\x9a\x84\xe9\x9c\x80\xe6\xb1\x82\xef\xbc\x8c \xe8\x83\xbd\xe5\x8a\x9b\xe5\xa4\xa9\xe7\xa9\xba\xe8\x83\xbd\xe8\xae\xa9\xe4\xbd\xa0\xe6\x9c\x89\xe6\xb1\x82\xe5\xbf\x85\xe5\xba\x94\xef\xbc\x81" /&gt;\r\n&lt;meta name="keywords" content="\xe7\x88\xb1\xe7\x99\xbe\xe4\xbb\x95, \xe8\x83\xbd\xe5\x8a\x9b\xe5\xa4\xa9\xe7\xa9\xba, AbleSky, \xe7\x9f\xa5\xe8\xaf\x86\xe4\xba\xa4\xe6\x98\x93\xe5\xb9\xb3\xe5\x8f\xb0, \xe7\x9f\xa5\xe8\xaf\x86\xe4\xba\xa4\xe6\x98\x93, \xe8\xa7\x86\xe9\xa2\x91\xe6\x8e\x88\xe8\xaf\xbe, \xe4\xb8\x93\xe4\xb8\x9a\xe8\xb5\x84\xe6\x96\x99, \xe9\x9c\x80\xe6\xb1\x82\xe6\x82\xac\xe8\xb5\x8f, \xe8\x89\xba\xe6\x9c\xaf\xe5\x8f\x8a\xe5\x88\x9b\xe9\x80\xa0\xe6\x80\xa7\xe6\x9c\x8d\xe5\x8a\xa1, \xe5\x81\xa5\xe5\xba\xb7\xe4\xb8\x8e\xe5\x8c\xbb\xe7\x96\x97, \xe4\xb8\x93\xe4\xb8\x9a\xe5\x92\xa8\xe8\xaf\xa2, \xe4\xb8\xaa\xe4\xba\xba\xe5\x9f\xb9\xe8\xae\xad\xe4\xb8\x8e\xe5\x8f\x91\xe5\xb1\x95, \xe6\x95\x99\xe8\x82\xb2\xe6\x9c\x8d\xe5\x8a\xa1, \xe4\xbc\x91\xe9\x97\xb2\xe5\xa8\xb1\xe4\xb9\x90, \xe8\xb4\xad\xe7\x89\xa9\xe4\xb8\x8e\xe6\x97\xb6\xe5\xb0\x9a, \xe7\xb2\xbe\xe7\xa5\x9e\xe4\xb8\x8e\xe5\xae\x97\xe6\x95\x99, \xe5\x95\x86\xe4\xb8\x9a\xe4\xb8\x8e\xe8\xb4\xa2\xe5\x8a\xa1, \xe8\xae\xa1\xe7\xae\x97\xe6\x9c\xba\xe7\xbc\x96\xe7\xa8\x8b, \xe6\xb3\x95\xe5\xbe\x8b\xe6\x9c\x8d\xe5\x8a\xa1, \xe8\xaf\xbe\xe5\x90\x8e\xe8\xbe\x85\xe5\xaf\xbc, \xe4\xb8\x93\xe5\xae\xb6\xe5\xbb\xba\xe8\xae\xae, \xe7\x9f\xa5\xe8\xaf\x86\xe6\x8a\x80\xe8\x83\xbd, \xe5\x92\xa8\xe8\xaf\xa2, \xe6\x95\x99\xe5\xad\xa6\xe6\x8c\x87\xe5\xaf\xbc, \xe7\xad\x94\xe7\x96\x91, \xe7\x96\x91\xe9\x9a\xbe\xe8\xa7\xa3\xe7\xad\x94" /&gt;\r\n&lt;meta http-equiv="X-UA-Compatible" content="IE=edge" /&gt; &lt;meta name="format-detection" content="telephone=no"&gt;\r\n&lt;base href="http://www.ablesky.com/" /&gt;\r\n&lt;link rel="shortcut icon" type="image/x-icon" href="http://img.ablesky.cn/stata/images/favicon_7ca206fd.ico" /&gt;\r\n&lt;link rel="search" type="application/opensearchdescription+xml" title="\xe8\x83\xbd\xe5\x8a\x9b\xe5\xa4\xa9\xe7\xa9\xba\xe8\xaf\xbe\xe7\xa8\x8b\xe6\x90\x9c\xe7\xb4\xa2" href="http://www.ablesky.com/s/opensearch.xml" /&gt;\r\n&lt;link type="text/css" rel="stylesheet" href="http://css.ablesky.cn/stata/css_optimize/common/global-min_546660c3.css?v=201403190949" /&gt;\r\n&lt;script type="text/javascript" src="http://js.ablesky.cn/stata/js_optimize/lib/require-jquery_981ae615.js?v=201403190949"&gt;&lt;/script&gt;\r\n&lt;script type="text/javascript"&gt;\r\nvar isAbleskyDomain = true, isOrgVIP = false, BAIDU_SHARE_UID = \'6472089\', HTTP_SERVER = \'http://www.ablesky.com/\', HTTPS_SERVER = \'http://www.ablesky.com/\',\r\n\tMOBILE_SERVER= \'http://mobile.ablesky.com/\', SEARCH_SERVER = \'http://www.ablesky.com/s/\', IM_SERVER = \'http://im.ablesky.com/\', PASSPORT_SERVER = \'http://passport.ablesky.com/\', AD_SERVER = \'http://ad.ablesky.com/\', LS_SERVER=\'http://www.ablesky.com/ls/\', EXAM_SERVER=\'http://www.ablesky.com/exam/\',\r\n\tBASE_PATH = \'http://www.ablesky.com/\', HY_PATH = \'http://hy.ablesky.com/\', JS_PATH = \'http://js.ablesky.cn/stata/js_optimize\', IMG_PATH = \'http://img.ablesky.cn/stata/images\', CSS_PATH = \'http://css.ablesky.cn/stata/css_optimize\' ,STAT_PATH= \'http://js.ablesky.cn/stata/\' , FLASH_VERSION = \'201801231050\' ;\r\n\t\r\nrequire.config({\r\n\tbaseUrl: \'http://js.ablesky.cn/stata/js_optimize\', urlArgs: \'v=201403190949\', waitSeconds : 0, config: {\r\n\t\t\'common/global\': {\r\n\t\t\tUSER : {\r\n\t\t\t\tisGuest: false,\r\n\t\t\t    username : \'aa-1\',\r\n\t\t\t\tscreenName : \'aa-1\',\r\n\t\t\t\tphotoUrl : \'http://pic5.ablesky.cn/content/pic/organizationphoto/2017/02/23/57921825-70d0-4cc2-9798-fc404317c937.jpg?v=3k\',\r\n\t\t\t\tisAverageUser : false,\r\n\t\t\t\tisDescendantUserWithoutAuth : false, \t// \xe6\x9c\xba\xe6\x9e\x84\xe6\x88\x90\xe5\x91\x98\r\n\t\t\t\tisDescendantUserWithAuth : true, \t\t// \xe6\x9c\xba\xe6\x9e\x84\xe5\xad\x90\xe7\xae\xa1\xe7\x90\x86\xe5\x91\x98\r\n\t\t\t\tisSuperOrganizationManager : false, \t// \xe6\x9c\xba\xe6\x9e\x84\xe6\x80\xbb\xe7\xae\xa1\xe7\x90\x86\xe5\x91\x98\r\n\t\t\t\torgSuperAdminUserName : \'mingzhutest\',\t\t\t// \xe6\x9c\xba\xe6\x9e\x84\xe6\x80\xbb\xe7\xae\xa1\xe7\x90\x86\xe5\x91\x98\xe7\x94\xa8\xe6\x88\xb7\xe5\x90\x8d\r\n\t\t\t\torganizationId: 15480,\r\n\t\t\t\tisClientOnline : false, // golive\xe5\x9c\xa8\xe7\xba\xbf\xe7\x8a\xb6\xe6\x80\x81\r\n\t\t\t\temail: \'aa-1@qq.com\',\r\n\t\t\t\tisEmailActive: true,\r\n\t\t\t\tnewsCount: 31,\r\n\t\t\t\tisInternal: false\r\n\t\t\t},\r\n\t\t\tstaticURISearch: \'null\',\r\n\t\t\tisClient:\'false\'\r\n\t\t}\r\n    }\r\n});\r\n&lt;/script&gt;\r\n&lt;script type="text/javascript" id="bdshare_js" data="type=tools&amp;amp;uid=6472089"&gt;&lt;/script&gt;\r\n&lt;!--[if lt IE 9]&gt; &lt;script src="http://js.ablesky.cn/stata/js_optimize/lib/shiv/html5_7b7495a8.js"&gt;&lt;/script&gt; &lt;![endif]--&gt;\r\n&lt;script&gt;\r\nvar hmt = hmt || [];\r\nfunction externalAnalyse() {\r\n\tvar hm = document.createElement("script");\r\n\thm.src = "https://hm.baidu.com/hm.js?2c3784f03626d6f26635da62b9bfad4f";\r\n\tvar s = document.getElementsByTagName("script")[0]; \r\n\ts.parentNode.insertBefore(hm, s);\r\n}\r\ndocument.addEventListener(\'DOMContentLoaded\', externalAnalyse);\r\n&lt;/script&gt;\r\n&lt;!--[if lt IE 8]&gt;\r\n&lt;script&gt;\r\ndocument.attachEvent(\'load\', externalAnalyse);\r\n&lt;/script&gt;\r\n&lt;![endif]--&gt;\r\n&lt;script type="text/javascript"&gt;require.config({paths: {"accessory/feedback":"accessory/feedback_3f97c27b","accessory/webim":"accessory/webim_3081eb25","common/global":"common/global_679297b5","analytics/ableanalytics":"analytics/ableanalytics_565d6a68","common/site-nav":"common/site-nav_e4dc1dd4","common/module-letter":"common/module-letter_6358f859","lib/jquery/jquery.blockui":"lib/jquery/jquery.blockui_710f3e","lib/jquery/jquery.fixedwidth":"lib/jquery/jquery.fixedwidth_f791becf","course/module-cart":"course/module-cart_e2ffabf3","component/consultNewMsg":"component/consultNewMsg_dacb556f","lib/jquery/jquery.cookie":"lib/jquery/jquery.cookie_47ec75be","lib/jquery/jquery.dialog":"lib/jquery/jquery.dialog_a1266ac0","lib/jquery/jquery.poshytip":"lib/jquery/jquery.poshytip_e020d5b0","lib/shiv/json2":"lib/shiv/json2_86f31c25","common/widget-poplogin":"common/widget-poplogin_50b994a9","account/widget-3partylogin":"account/widget-3partylogin_a627edad","common/module-login":"common/module-login_2cb3bb7d","common/md5":"common/md5_ebef7d4c","component/qrLogin":"component/qrLogin_d5533c59","lib/jquery/jquery.scrollTo-2.1.2":"lib/jquery/jquery.scrollTo-2.1.2_a94b969d","lib/jquery/jquery.scrollto":"lib/jquery/jquery.scrollto_48de520e","lib/jquery/jquery.placeholder":"lib/jquery/jquery.placeholder_38a6693f"}});&lt;/script&gt;&lt;meta name="description" content="AbleSky,\xe8\x83\xbd\xe5\x8a\x9b\xe5\xa4\xa9\xe7\xa9\xba,\xe8\xbf\x9c\xe7\xa8\x8b\xe6\x95\x99\xe8\x82\xb2,\xe8\xbf\x9c\xe7\xa8\x8b\xe6\x95\x99\xe8\x82\xb2\xe7\xb3\xbb\xe7\xbb\x9f,\xe8\xbf\x9c\xe7\xa8\x8b\xe6\x95\x99\xe8\x82\xb2\xe5\xb9\xb3\xe5\x8f\xb0,\xe8\xbf\x9c\xe7\xa8\x8b\xe6\x95\x99\xe8\x82\xb2\xe7\xbd\x91" /&gt;\r\n\t&lt;meta name="keywords" content="AbleSky,\xe8\x83\xbd\xe5\x8a\x9b\xe5\xa4\xa9\xe7\xa9\xba,\xe8\xbf\x9c\xe7\xa8\x8b\xe6\x95\x99\xe8\x82\xb2,\xe8\xbf\x9c\xe7\xa8\x8b\xe6\x95\x99\xe8\x82\xb2\xe7\xb3\xbb\xe7\xbb\x9f,\xe8\xbf\x9c\xe7\xa8\x8b\xe6\x95\x99\xe8\x82\xb2\xe7\xbd\x91,\xe8\xbf\x9c\xe7\xa8\x8b\xe6\x95\x99\xe8\x82\xb2\xe5\xb9\xb3\xe5\x8f\xb0,\xe7\xbd\x91\xe7\xbb\x9c\xe6\x95\x99\xe8\x82\xb2\xe5\xb9\xb3\xe5\x8f\xb0,\xe7\xbd\x91\xe7\xbb\x9c\xe8\xaf\xbe\xe5\xa0\x82,\xe7\xbd\x91\xe4\xb8\x8a\xe6\x95\x99\xe5\xad\xa6,\xe7\xbd\x91\xe4\xb8\x8a\xe8\xaf\xbe\xe5\xa0\x82,\xe5\x9c\xa8\xe7\xba\xbf\xe8\xaf\xbe\xe5\xa0\x82,\xe8\xa7\x86\xe9\xa2\x91\xe6\x95\x99\xe8\x82\xb2,\xe5\x9c\xa8\xe7\xba\xbf\xe9\x94\x80\xe5\x94\xae" /&gt;\r\n\t&lt;link type="text/css" rel="stylesheet" href="http://css.ablesky.cn/stata/css_optimize/page-login_595703f5.css?v=201403190949" /&gt;\r\n\n&lt;script type="text/javascript"&gt;require.config({paths: {"index/login-init":"index/login-init_c9065b5e"}});&lt;/script&gt;\n&lt;/head&gt; \r\n\r\n&lt;body&gt;\r\n&lt;input type="hidden" id="isLoginPage" /&gt; &lt;input type="hidden" id="J_loginType" value="" /&gt;\r\n&lt;input type="hidden" id="organizationId" value="" /&gt;\r\n&lt;input type="hidden" id="companyName" value="" /&gt;\r\n&lt;input type="hidden" id="adminUsername" value="" /&gt;\r\n&lt;section id="J_loginSection" class="login-wrapper main-section"&gt;\r\n\t&lt;section class="header-register clearfix"&gt;\r\n\t&lt;h1 class="site-logo-area"&gt;\r\n\t\t&lt;a class="ablesky-logo" href="http://www.ablesky.com/"&gt;\xe8\x83\xbd\xe5\x8a\x9b\xe5\xa4\xa9\xe7\xa9\xba AbleSky.com&lt;/a&gt;\r\n\t\t\t\t&lt;a class="ablesky-vision" href="http://www.ablesky.com/"&gt;\xe4\xb8\x93\xe4\xb8\x9a\xe5\xad\xa6\xe4\xb9\xa0\xe5\xb9\xb3\xe5\x8f\xb0&lt;/a&gt;   \r\n\t\t\t&lt;/h1&gt;\r\n\t\r\n&lt;/section&gt;\r\n&lt;!-- warn tips --&gt;\t\r\n\t&lt;div class="main-section warnning-tip"&gt;\r\n\t\t&lt;div class="top"&gt;&lt;/div&gt;\r\n\t\t&lt;div class="middle"&gt;\r\n\t\t\t&lt;span class="message"&gt;&lt;/span&gt;\r\n\t\t&lt;/div&gt;\r\n\t\t&lt;div class="bottom"&gt;&lt;/div&gt;\r\n\t&lt;/div&gt;\r\n\t&lt;div class="login-outer clearfix"&gt;\r\n\t\t&lt;div class="watch-section"&gt;\r\n\t\t\t&lt;a class="guest-login-image" target="_blank" id="J_publicImg" hidefocus=true target="_blank"&gt;&lt;img src="" /&gt;&lt;/a&gt;\r\n\t\t\t&lt;/div&gt;\r\n\t\t&lt;div class="login-main"&gt;\r\n\t\t\t&lt;div class="ra-shadow-box"&gt;\r\n\t\t\t\t&lt;div class="s-topbg"&gt;&lt;/div&gt;\r\n\t\t\t\t&lt;div class="s-content"&gt;\r\n\t\t\t\t\t&lt;div class="clearfix" style="position: relative; padding:13px 20px 20px 20px;"&gt;\r\n\t\t\t\t\t\t&lt;h3&gt;\xe7\x94\xa8\xe6\x88\xb7\xe7\x99\xbb\xe5\xbd\x95\r\n\t\t\t\t\t\t\t&lt;/h3&gt;\r\n\t\t\t\t\t\t&lt;form id="J_loginMod" class="innerlayer clearfix" style=""&gt;\r\n\t\t\t\t\t\t\t&lt;fieldset&gt;\r\n\t\t\t\t\t\t        &lt;section class="content clearfix"&gt;\t\t\t        \t\r\n\t\t\t\t\t\t\t\t\t&lt;article class="module-login"&gt;\r\n\t\t\t\t\t\t\t\t\t\t&lt;label for="J_loginUsername" class="forusername"&gt;\xe9\x82\xae\xe7\xae\xb1/\xe6\x89\x8b\xe6\x9c\xba\xe5\x8f\xb7/\xe7\x94\xa8\xe6\x88\xb7\xe5\x90\x8d:&lt;/label&gt;\r\n\t\t\t\t\t\t\t\t\t\t&lt;div class="item" style="margin-bottom: 8px;"&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t&lt;div class="field-wrapper clearfix account"&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\t&lt;div class="l"&gt;&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\t&lt;div class="c"&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t&lt;input class="field" id="J_loginUsername"  name="username" tabindex="1" autocomplete="on" /&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t&lt;b class="icon"&gt;&lt;/b&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\t&lt;div class="r"&gt;&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\r\n\t\t\t\t\t\t\t\t\t\t&lt;label for="J_loginPassword" class="forpwd"&gt;\xe5\xaf\x86\xe7\xa0\x81:&lt;/label&gt;\r\n\t\t\t\t\t\t\t\t\t\t&lt;div class="item"  style="margin-bottom: 15px;"&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t&lt;div class="field-wrapper clearfix"&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\t&lt;div class="l"&gt;&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\t&lt;div class="c"&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t&lt;input class="field" id="J_loginPassword" name="password" type="password" tabindex="1" autocomplete="on" /&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t&lt;b class="icon"&gt;&lt;/b&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t&lt;div id="J_errerTip" class="invalid-text"&gt; \r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t&lt;p for="J_verifycode" generated="true" class="error"&gt;&lt;/p&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t&lt;s&gt;\xe2\x97\x86&lt;/s&gt; \r\n\t\t\t\t\t\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\t&lt;div class="r"&gt;&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\t\t&lt;p class="frozentip"&gt;&lt;/p&gt;\r\n\t\t\t\t\t\t\t\t\t\t&lt;div class="item"&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t&lt;label class="remem" for="J_rememberMe"&gt;\r\n\t\t\t\t\t\t\t\t\t\t\t&lt;input type="checkbox" id="J_rememberMe" class="remem" name="_acegi_save_account" /&gt;&amp;nbsp;&amp;nbsp;\xe8\x87\xaa\xe5\x8a\xa8\xe7\x99\xbb\xe5\xbd\x95&lt;/label&gt;\r\n\t\t\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;/article&gt;\t\r\n\t\t\t\t\t\t\t\t&lt;/section&gt;\r\n\t\t\t\t\t\t\t\t&lt;div class="login-btn-wrap"&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;a id="J_loginBtn" class="login-btn" tabindex="1" href="javascript:void(0);"&gt;\r\n\t\t\t\t\t\t\t\t\t\t\xe7\x99\xbb\xe5\xbd\x95\r\n\t\t\t\t\t\t\t\t\t&lt;/a&gt;\r\n\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t&lt;div class="links-wrap clearfix"&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;a class="forget-pwd-link float-left" href="accountRedirect.do?action=getPwdBack&amp;fromurl=null" target="_blank"&gt;\xe5\xbf\x98\xe8\xae\xb0\xe5\xaf\x86\xe7\xa0\x81&lt;/a&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;a class="register-link float-right" href="registerRedirect.do?action=toRegister&amp;fromurl=null"&gt;\xe7\xab\x8b\xe5\x8d\xb3\xe6\xb3\xa8\xe5\x86\x8c&lt;/a&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;span class="float-right"&gt;\xe6\xb2\xa1\xe6\x9c\x89\xe5\xb8\x90\xe5\x8f\xb7\xef\xbc\x9f&lt;/span&gt;\r\n\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t\t&lt;!-- &lt;a style="margin-left:20px;"\r\n\t\t\t\t\t\t\t\t\t\tid="account-register" class="account-register" href="registerRedirect.do?action=toRegister&amp;fromurl=http%3A%2F%2Fwww.ablesky.com%2Flogin.do"\r\n\t\t\t\t\t\t\t\t\t&gt;\xe6\xb3\xa8\xe5\x86\x8c&lt;/a&gt; --&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;div class="third-party-login login-other-third" style=" clear: both;"&gt;&lt;/div&gt;\r\n\t\t\t\t\t\t\t    &lt;/fieldset&gt;\r\n\t\t\t\t\t\t\t&lt;div class="switch-tip"&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;p&gt;\xe6\x89\xab\xe7\xa0\x81\xe7\x99\xbb\xe5\xbd\x95\xe5\x9c\xa8\xe8\xbf\x99\xe9\x87\x8c&lt;/p&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;i&gt;&lt;/i&gt;\r\n\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t&lt;/form&gt;\r\n\t\t\t\t\t\t&lt;section class="qr-login-wrap J_qr_login"&gt;\r\n\t\t\t\t\t\t\t\t&lt;div class="switch-tip"&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;p&gt;\xe5\xb8\x90\xe5\x8f\xb7\xe5\xaf\x86\xe7\xa0\x81\xe7\x99\xbb\xe5\xbd\x95\xe5\x9c\xa8\xe8\xbf\x99\xe9\x87\x8c&lt;/p&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;i&gt;&lt;/i&gt;\r\n\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t&lt;div class="qrcode-mod"&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;div class="qrcode-main"&gt;&lt;span class="loading"&gt;\xe5\x8a\xa0\xe8\xbd\xbd\xe4\xb8\xad&lt;/span&gt;&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;div class="qrcode-desc"&gt;\r\n\t\t\t\t\t\t\t\t\t\t&lt;p&gt;\xe6\x89\x93\xe5\xbc\x80&lt;a href="/p/m" target="_blank"&gt;APP&lt;/a&gt;\xe6\x89\xab\xe7\xa0\x81\xe7\x99\xbb\xe5\xbd\x95&lt;/p&gt;\r\n\t\t\t\t\t\t\t\t\t\t&lt;a href="registerRedirect.do?action=toRegister&amp;fromurl=null" class="register"&gt;\xe6\x96\xb0\xe7\x94\xa8\xe6\x88\xb7\xe6\xb3\xa8\xe5\x86\x8c&lt;/a&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;div class="qrcode-refresh"&gt;\r\n\t\t\t\t\t\t\t\t\t\t&lt;p&gt;\xe4\xba\x8c\xe7\xbb\xb4\xe7\xa0\x81\xe5\xa4\xb1\xe6\x95\x88&lt;/p&gt;\r\n\t\t\t\t\t\t\t\t\t\t&lt;a class="refresh" href="javascript:;" &gt;\xe5\x88\xb7\xe6\x96\xb0&lt;/a&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t&lt;div class="qrcode-msg"&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;div class="sran-success"&gt;&lt;/div&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;p&gt;\xe8\xaf\xb7\xe5\x9c\xa8\xe6\x89\x8b\xe6\x9c\xba\xe4\xb8\x8a\xe7\xa1\xae\xe8\xae\xa4\xe7\x99\xbb\xe5\xbd\x95&lt;/p&gt;\r\n\t\t\t\t\t\t\t\t\t&lt;a class="return" href="javascript:;"&gt;\xe8\xbf\x94\xe5\x9b\x9e\xe4\xba\x8c\xe7\xbb\xb4\xe7\xa0\x81\xe9\xa1\xb5\xe9\x9d\xa2&lt;/a&gt;\r\n\t\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t\t&lt;/section&gt;\r\n\t\t\t\t\t\t\t&lt;div class="login-switch-wrap"&gt;\r\n\t\t\t\t\t\t\t\t&lt;div class="login-switch J_login_switch qr"&gt;&lt;/div&gt;\r\n\t\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t\t\t&lt;/div&gt;\r\n\t\t\t\t&lt;/div&gt; &lt;!-- .s-content END --&gt;\r\n\t\t\t\t&lt;div class="s-bottompbg"&gt;&lt;/div&gt; \r\n\t\t\t&lt;/div&gt; &lt;!-- .ra-shadow-box END --&gt;\r\n\t\t\t&lt;/div&gt;\r\n\t&lt;/div&gt;\r\n&lt;/section&gt;&lt;!-- .login-section END --&gt;\r\n&lt;!-- \xe8\x83\xbd\xe5\x8a\x9b\xe6\x92\xad\xe6\x94\xbe\xe5\x99\xa8\xe9\x9a\x90\xe8\x97\x8f\xe9\xa1\xb5\xe8\x84\x9a20171211--1 --&gt;\r\n&lt;footer class="as-footer clearfix"&gt;\r\n\t&lt;section class="site-map clearfix"&gt;\t\r\n\t\t\t\t&lt;div class="container"&gt;\r\n\t\t\t\t\t&lt;p class="openSchool"&gt;&lt;a href="http://wx.ablesky.com/" target="_blank"&gt;\xe5\x85\x8d\xe8\xb4\xb9\xe5\xbc\x80\xe9\x80\x9a\xe7\xbd\x91\xe6\xa0\xa1&lt;/a&gt;&lt;/p&gt;\t\r\n\t\t\t\t\t&lt;nav&gt;\r\n\t\t\t\t\t\t&lt;a class="item" href="http://www.ablesky.com/page.do?oid=18238&amp;subject=aboutUs01" target="_blank" rel="nofollow"&gt;\xe5\x85\xb3\xe4\xba\x8e\xe6\x88\x91\xe4\xbb\xac&lt;/a&gt;\r\n\t\t\t\t\t\t&lt;span&gt;|&lt;/span&gt;\r\n\t\t\t\t\t\t&lt;a class="item" href="http://www.ablesky.com/org/336/post?titleId=9405" target="_blank"&gt;\xe8\x83\xbd\xe5\x8a\x9b\xe5\xa4\xa9\xe7\xa9\xba\xe5\x8a\xa8\xe6\x80\x81&lt;/a&gt;\r\n\t\t\t\t\t\t&lt;span&gt;|&lt;/span&gt;\r\n\t\t\t\t\t\t&lt;a class="item" href="http://www.ablesky.com/page.do?oid=18238&amp;subject=aboutUs03" target="_blank" rel="nofollow"&gt;\xe8\xb5\x84\xe8\xb4\xa8&lt;/a&gt;\r\n\t\t\t\t\t\t&lt;span&gt;|&lt;/span&gt;\r\n\t\t\t\t\t\t&lt;a class="item" href="http://www.ablesky.com/sc/center" target="_blank" rel="nofollow"&gt;\xe5\xb8\xae\xe5\x8a\xa9\xe4\xb8\xad\xe5\xbf\x83&lt;/a&gt;\r\n\t\t\t\t\t\t&lt;span&gt;|&lt;/span&gt;\r\n\t\t\t\t\t\t&lt;a class="item" href="http://www.ablesky.com/page.do?oid=18238&amp;subject=aboutUs04" target="_blank" rel="nofollow"&gt;\xe8\x81\x94\xe7\xb3\xbb\xe6\x88\x91\xe4\xbb\xac&lt;/a&gt;\r\n\t\t\t\t\t&lt;/nav&gt;\r\n\t\t\t\t\t\r\n\t\t\t\t\t&lt;p class="copyright"&gt;\r\n\t\t\t\t\t\t&amp;copy; 2018 Ablesky, Inc. \xe7\x89\x88\xe6\x9d\x83\xe6\x89\x80\xe6\x9c\x89, \xe8\x83\xbd\xe5\x8a\x9b\xe5\xa4\xa9\xe7\xa9\xba\xe7\xa7\x91\xe6\x8a\x80\xef\xbc\x88\xe5\x8c\x97\xe4\xba\xac\xef\xbc\x89\xe6\x9c\x89\xe9\x99\x90\xe5\x85\xac\xe5\x8f\xb8 \r\n\t\t\t\t\t&lt;/p&gt;\r\n\t\t\t\t\t&lt;p class="copyright"&gt;\r\n\t\t\t\t\t\t&lt;a href="http://www.miibeian.gov.cn" target="_blank"&gt;\xe4\xba\xacICP\xe5\xa4\x8712011415\xe5\x8f\xb7-1&lt;/a&gt;\r\n\t\t\t\t\t\t&lt;a href="http://www.miibeian.gov.cn" target="_blank"&gt;\xe4\xba\xacICP\xe8\xaf\x81080499\xe5\x8f\xb7&lt;/a&gt;\r\n\t\t\t\t\t\t&lt;a href="http://www.miibeian.gov.cn" target="_blank"&gt;\xe4\xba\xac\xe5\x85\xac\xe7\xbd\x91\xe5\xae\x89\xe5\xa4\x87110108007315\xe5\x8f\xb7 &lt;/a&gt;\r\n\t\t\t\t\t\t&lt;a href="http://www.ablesky.com/org/post/detail_17083" target="_blank"&gt;\xe4\xba\xac\xe7\xbd\x91\xe6\x96\x87[2014]0769-169\xe5\x8f\xb7&lt;/a&gt;\r\n\t\t\t\t\t&lt;/p&gt;\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\t&lt;p class="weibo"&gt;\r\n\t\t\t\t\t\t&lt;a class="ablesky-colortip sina" title="\xe5\x85\xb3\xe6\xb3\xa8\xe8\x83\xbd\xe5\x8a\x9b\xe5\xa4\xa9\xe7\xa9\xba\xe5\xae\x98\xe6\x96\xb9\xe5\xbe\xae\xe5\x8d\x9a @Ablesky2012" target="_blank" href="http://e.weibo.com/ablesky2012"&gt;&lt;/a&gt;\r\n\t\t\t\t\t\t&lt;!-- &lt;a class="ablesky-colortip tencent" title="\xe5\x85\xb3\xe6\xb3\xa8\xe8\x83\xbd\xe5\x8a\x9b\xe5\xa4\xa9\xe7\xa9\xba\xe5\xae\x98\xe6\x96\xb9\xe5\xbe\xae\xe5\x8d\x9a @nenglitiankong" target="_blank" href="http://t.qq.com/nenglitiankong"&gt;&lt;/a&gt; --&gt;\r\n\t\t\t\t\t&lt;/p&gt;\r\n\t\t\t\t&lt;/div&gt;\r\n\t\t\t&lt;/section&gt;\r\n\t\t\t&lt;/footer&gt;\r\n&lt;script type="text/javascript"&gt;\r\nrequire.config({\r\n\tconfig: {\r\n\t\t\'index/login-init\': {\r\n\t\t\tisTaobaoCard : false,\r\n\t\t\tisAdPlatform:false,\r\n\t\t\tisOneStepLogin : false,\r\n\t\t\tcallbackUrl : \'\',\r\n\t\t\tencodedUserInfo : \'\',\r\n\t\t\tisLoginLinkExpired : false,\r\n\t\t\torgName:\'\',\r\n            imgPath:\'http://img.ablesky.cn/stata/images\',\r\n            hyServer:\'http://hy.ablesky.com/\',\r\n            recommendServer:\'http://ai.ablesky.com/\',\r\n            isAsDomain: true\r\n\t\t}\r\n    }\r\n});\r\nrequire([\'index/login-init\']);\r\n&lt;/script&gt;\r\n\r\n&lt;/body&gt;\r\n&lt;/html&gt;\r\n'
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt2.2' class='hiddenRow'>
+    <td ><div class='testcase'>testReportadd: ablesky发布留言</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt2.2')" >
+        通过</a></span>
+
+    <div id='div_pt2.2' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt2.2').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt2.2: 字典转换成json：
+&lt;class 'dict'&gt;
+{'canDelete': True, 'gossiperPhotoUrl': 'http://pic1.ablesky.cn/content/pic/organizationphoto/2017/02/23/57921825-70d0-4cc2-9798-fc404317c937.jpg?v=dz', 'content': '添加留言aa-3', 'id': None, 'isGuest': False, 'gossiperUserName': 'mingzhutest', 'gossiperId': 5910322, 'gossipId': 129463, 'gossiperScreenName': '东方明珠网校测试', 'gossipCommentDTOs': None, 'gossipType': 'normal', 'postTime': '2018-01-29 11:47', 'showPublic': True}
+mingzhutest
+发布成功
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr class='passClass'>
+    <td>mokuai02.test03.LoginCase: test03测试用例</td>
+    <td>4</td>
+    <td>4</td>
+    <td>0</td>
+    <td>0</td>
+    <td><a href="javascript:showClassDetail('c3',4)">详情</a></td>
+    <td>&nbsp;</td>
+</tr>
+
+<tr id='pt3.1' class='hiddenRow'>
+    <td ><div class='testcase'>test01: test03下面的01测试</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt3.1')" >
+        通过</a></span>
+
+    <div id='div_pt3.1' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt3.1').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt3.1: setUp:前置，每个用例都会先执行这个
+走登录流程，登录了Login
+test01
+tearDown:后置，每次用例执行完，都会执行这个
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt3.2' class='hiddenRow'>
+    <td ><div class='testcase'>test02: test03下面的02测试</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt3.2')" >
+        通过</a></span>
+
+    <div id='div_pt3.2' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt3.2').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt3.2: setUp:前置，每个用例都会先执行这个
+走登录流程，登录了Login
+test02
+tearDown:后置，每次用例执行完，都会执行这个
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt3.3' class='hiddenRow'>
+    <td ><div class='testcase'>test03: test03下面的03测试</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt3.3')" >
+        通过</a></span>
+
+    <div id='div_pt3.3' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt3.3').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt3.3: setUp:前置，每个用例都会先执行这个
+走登录流程，登录了Login
+test03
+tearDown:后置，每次用例执行完，都会执行这个
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='pt3.4' class='hiddenRow'>
+    <td ><div class='testcase'>test04</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <span class='status passCase'>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt3.4')" >
+        通过</a></span>
+
+    <div id='div_pt3.4' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt3.4').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt3.4: setUp:前置，每个用例都会先执行这个
+走登录流程，登录了Login
+04测试发帖：testReport
+tearDown:后置，每次用例执行完，都会执行这个
+
+
+        </pre>
+    </div>
+    <!--css div popup end-->
+
+    </td>
+    <td></td>
+</tr>
+
+<tr id='total_row'>
+    <td>统计</td>
+    <td>8</td>
+    <td>7</td>
+    <td>1</td>
+    <td>0</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+</tr>
+</table>
+<script>
+    drawCircle(7, 1, 0)
+</script>
+
+<div id='ending'>&nbsp;</div>
+
+</body>
+</html>
